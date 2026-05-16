@@ -370,13 +370,29 @@
       <div class="logo">🐝 abelhaKut</div>
       <p class="subtitle">Sua rede social simples e divertida</p>
 
-      <input id="nomeInput" placeholder="Nome para cadastro" />
-      <input id="emailInput" type="email" placeholder="Email" />
-      <input id="senhaInput" type="password" placeholder="Senha" />
+      <div id="loginBox">
+        <input id="loginEmailInput" type="email" placeholder="E-mail" />
+        <input id="loginSenhaInput" type="password" placeholder="Senha" />
 
-      <button onclick="login()">Entrar</button>
-      <button onclick="cadastrar()">Cadastrar</button>
-      <button class="link-btn" onclick="recuperarSenha()">Recuperar senha</button>
+        <button onclick="login()">Entrar</button>
+        <button class="link-btn" onclick="mostrarCadastro()">Ainda não é um membro abelhaKut?</button>
+        <button class="link-btn" onclick="recuperarSenha()">Recuperar senha</button>
+      </div>
+
+      <div id="cadastroBox" class="hidden">
+        <input id="cadastroNomeInput" placeholder="Nome" />
+        <input id="cadastroEmailInput" type="email" placeholder="E-mail" />
+        <input id="cadastroSenhaInput" type="password" placeholder="Senha" />
+        <input id="cadastroNascimentoInput" type="date" />
+
+        <label style="display:flex; gap:8px; align-items:center; text-align:left; margin:8px 0 14px; color:#555; font-size:14px;">
+          <input id="maior16Input" type="checkbox" style="width:auto; margin:0;" />
+          Confirmo que sou maior de 16 anos
+        </label>
+
+        <button onclick="cadastrar()">Cadastrar</button>
+        <button class="link-btn" onclick="mostrarLogin()">Voltar para login</button>
+      </div>
 
       <p id="authStatus" class="status"></p>
     </div>
@@ -454,6 +470,8 @@
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
       sendPasswordResetEmail,
+      sendEmailVerification,
+      applyActionCode,
       signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -506,13 +524,52 @@
       </svg>
     `);
 
+    window.mostrarCadastro = function () {
+      loginBox.classList.add("hidden");
+      cadastroBox.classList.remove("hidden");
+      authStatus.textContent = "";
+    };
+
+    window.mostrarLogin = function () {
+      cadastroBox.classList.add("hidden");
+      loginBox.classList.remove("hidden");
+      authStatus.textContent = "";
+    };
+
+    async function verificarLinkDeEmail() {
+      const params = new URLSearchParams(window.location.search);
+      const mode = params.get("mode");
+      const oobCode = params.get("oobCode");
+
+      if (mode === "verifyEmail" && oobCode) {
+        try {
+          await applyActionCode(auth, oobCode);
+          mostrarLogin();
+          authStatus.textContent = "Parabéns, você agora é um membro abelhaKut. Volte para a tela de login.";
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (error) {
+          authStatus.textContent = "Esse link de confirmação já foi usado ou expirou.";
+        }
+      }
+    }
+
+    verificarLinkDeEmail();
+
     window.login = async function () {
-      const email = emailInput.value.trim();
-      const senha = senhaInput.value.trim();
+      const email = loginEmailInput.value.trim();
+      const senha = loginSenhaInput.value.trim();
       authStatus.textContent = "Entrando...";
 
       try {
-        await signInWithEmailAndPassword(auth, email, senha);
+        const cred = await signInWithEmailAndPassword(auth, email, senha);
+        await cred.user.reload();
+
+        if (!cred.user.emailVerified) {
+          await signOut(auth);
+          authStatus.textContent = "Confirme seu email antes de entrar. Veja o link que enviamos para sua caixa de entrada.";
+          return;
+        }
+
         authStatus.textContent = "";
       } catch (error) {
         authStatus.textContent = "Erro ao entrar: " + error.message;
@@ -520,13 +577,20 @@
     };
 
     window.cadastrar = async function () {
-      const nome = nomeInput.value.trim();
+      const nome = cadastroNomeInput.value.trim();
+      const email = cadastroEmailInput.value.trim();
+      const senha = cadastroSenhaInput.value.trim();
+      const nascimento = cadastroNascimentoInput.value;
+      const maior16 = maior16Input.checked;
       const foto = placeholderFoto;
-      const email = emailInput.value.trim();
-      const senha = senhaInput.value.trim();
 
-      if (!nome || !email || !senha) {
-        authStatus.textContent = "Preencha nome, email e senha.";
+      if (!nome || !email || !senha || !nascimento) {
+        authStatus.textContent = "Preencha nome, email, senha e data de nascimento.";
+        return;
+      }
+
+      if (!maior16) {
+        authStatus.textContent = "Para cadastrar, confirme que você é maior de 16 anos.";
         return;
       }
 
@@ -539,19 +603,28 @@
           uid: cred.user.uid,
           nome,
           email,
+          nascimento,
+          maior16,
           foto,
           amigos: [],
           criadoEm: serverTimestamp()
         });
 
-        authStatus.textContent = "Conta criada com sucesso!";
+        await sendEmailVerification(cred.user, {
+          url: window.location.href.split("?")[0],
+          handleCodeInApp: true
+        });
+
+        await signOut(auth);
+        mostrarLogin();
+        authStatus.textContent = "Enviamos um link de confirmação para seu email. Clique no link para autenticar sua conta.";
       } catch (error) {
         authStatus.textContent = "Erro ao cadastrar: " + error.message;
       }
     };
 
     window.recuperarSenha = async function () {
-      const email = emailInput.value.trim();
+      const email = loginEmailInput.value.trim() || cadastroEmailInput.value.trim();
 
       if (!email) {
         authStatus.textContent = "Digite seu email para recuperar a senha.";
@@ -636,6 +709,13 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        await user.reload();
+
+        if (!user.emailVerified) {
+          await signOut(auth);
+          return;
+        }
+
         usuarioAtual = user;
         await carregarUsuario();
         authScreen.classList.add("hidden");
