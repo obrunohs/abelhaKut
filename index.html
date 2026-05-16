@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>abelhaKut</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff3b0, #ffd166, #f7a800);
+      color: #2b2b2b;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .container {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 38px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #cf7d00;
+    }
+
+    .subtitle {
+      margin-bottom: 24px;
+      color: #666;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+      background: #f7a800;
+      color: white;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #d98f00;
+    }
+
+    .link-btn {
+      background: transparent;
+      color: #cf7d00;
+      padding: 4px;
+      margin: 4px 0;
+    }
+
+    .app {
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto 20px auto;
+      background: #fff;
+      padding: 18px;
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      gap: 12px;
+    }
+
+    header h1 {
+      color: #cf7d00;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .header-actions button {
+      width: auto;
+      margin: 0;
+      padding: 10px 14px;
+    }
+
+    .top-photo {
+      width: 36px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #eee;
+      border: 2px solid #ffd166;
+    }
+
+    .main-layout {
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .search-box {
+      margin-bottom: 18px;
+    }
+
+    .friends-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      min-height: 390px;
+    }
+
+    .friend-card {
+      border: 1px solid #eee;
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      background: #fffaf0;
+      transition: 0.2s;
+    }
+
+    .friend-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .friend-card img {
+      width: 70px;
+      height: 90px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #eee;
+      margin-bottom: 8px;
+    }
+
+    .friend-card p {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .pagination button {
+      margin: 0;
+    }
+
+    .add-area h3,
+    .chat-panel h3,
+    .profile-panel h3 {
+      margin-bottom: 12px;
+      color: #cf7d00;
+    }
+
+    .profile-panel {
+      margin-bottom: 20px;
+    }
+
+    .profile-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .profile-row img {
+      width: 70px;
+      height: 90px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .upload-label {
+      display: inline-block;
+      margin: 8px 0;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: #f7a800;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .profile-row small {
+      display: block;
+      color: #777;
+      font-size: 12px;
+    }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+
+    .result-item img {
+      width: 45px;
+      height: 55px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .result-item button {
+      width: auto;
+      margin: 0;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .chat-panel {
+      margin-top: 20px;
+    }
+
+    .chat-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .chat-user img {
+      width: 60px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .messages {
+      height: 310px;
+      overflow-y: auto;
+      background: #fffaf0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #f0dfb8;
+    }
+
+    .message {
+      max-width: 80%;
+      margin-bottom: 10px;
+      padding: 9px 11px;
+      border-radius: 12px;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+
+    .mine {
+      margin-left: auto;
+      background: #f7a800;
+      color: #fff;
+    }
+
+    .theirs {
+      margin-right: auto;
+      background: #fff;
+      border: 1px solid #eee;
+    }
+
+    .message small {
+      display: block;
+      margin-top: 5px;
+      font-size: 10px;
+      opacity: 0.75;
+    }
+
+    .delete-msg {
+      width: auto;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 4px 7px;
+      margin-top: 5px;
+      font-size: 11px;
+    }
+
+    .typing {
+      height: 18px;
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 8px;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input input {
+      margin: 0;
+    }
+
+    .chat-input button {
+      width: 90px;
+      margin: 0;
+    }
+
+    .status {
+      font-size: 14px;
+      margin-top: 8px;
+      color: #555;
+      min-height: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .friends-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <section id="authScreen" class="container">
+    <div class="auth-card">
+      <div class="logo">🐝 abelhaKut</div>
+      <p class="subtitle">Sua rede social simples e divertida</p>
+
+      <input id="nomeInput" placeholder="Nome para cadastro" />
+      <input id="emailInput" type="email" placeholder="Email" />
+      <input id="senhaInput" type="password" placeholder="Senha" />
+
+      <button onclick="login()">Entrar</button>
+      <button onclick="cadastrar()">Cadastrar</button>
+      <button class="link-btn" onclick="recuperarSenha()">Recuperar senha</button>
+
+      <p id="authStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="appScreen" class="app hidden">
+    <header>
+      <h1>🐝 abelhaKut</h1>
+      <div class="header-actions">
+        <img id="minhaFotoTopo" class="top-photo" src="" alt="Minha foto" />
+        <span id="meuNome"></span>
+        <button onclick="sair()">Sair</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <div class="panel">
+        <input id="pesquisaAmigos" class="search-box" placeholder="Pesquisar amigo pelo nome ou email..." oninput="pesquisarUsuarios()" />
+
+        <h2>Meus amigos</h2>
+        <br />
+        <div id="friendsGrid" class="friends-grid"></div>
+
+        <div class="pagination">
+          <button onclick="paginaAnterior()">← Anterior</button>
+          <button onclick="proximaPagina()">Próxima →</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel profile-panel">
+          <h3>Meu perfil</h3>
+          <div class="profile-row">
+            <img id="minhaFotoPerfil" src="" alt="Minha foto de perfil" />
+            <div>
+              <p>Foto de perfil</p>
+              <label class="upload-label" for="fotoArquivo">Enviar foto do computador</label>
+              <input id="fotoArquivo" type="file" accept="image/*" onchange="atualizarFotoPerfil(event)" hidden />
+              <small>Use uma imagem pequena para carregar melhor.</small>
+            </div>
+          </div>
+          <p id="fotoStatus" class="status"></p>
+        </div>
+
+        <div class="panel add-area">
+          <h3>Buscar pessoas</h3>
+          <div id="searchResults"></div>
+        </div>
+
+        <div id="chatPanel" class="panel chat-panel hidden">
+          <div class="chat-user">
+            <img id="chatFoto" src="" alt="Foto do amigo" />
+            <div>
+              <h3 id="chatNome"></h3>
+              <p>Chat em tempo real</p>
+            </div>
+          </div>
+
+          <div id="messages" class="messages"></div>
+          <div id="typingStatus" class="typing"></div>
+
+          <div class="chat-input">
+            <input id="messageInput" placeholder="Digite sua mensagem..." oninput="marcarDigitando()" onkeydown="if(event.key === 'Enter') enviarMensagem()" />
+            <button onclick="enviarMensagem()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      sendPasswordResetEmail,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      collection,
+      query,
+      where,
+      getDocs,
+      addDoc,
+      deleteDoc,
+      serverTimestamp,
+      orderBy,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Configuração do Firebase do projeto abelhaKut
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuNKXST-CCpDvlTtu3QX7FDgNxT5A7Kt0",
+      authDomain: "abelhakut.firebaseapp.com",
+      projectId: "abelhakut",
+      storageBucket: "abelhakut.firebasestorage.app",
+      messagingSenderId: "579128790046",
+      appId: "1:579128790046:web:a60317ff1c1526fb80320f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let usuarioAtual = null;
+    let dadosUsuario = null;
+    let amigos = [];
+    let paginaAtual = 0;
+    let amigoChat = null;
+    let chatIdAtual = null;
+    let unsubscribeMessages = null;
+    let unsubscribeTyping = null;
+    let typingTimer = null;
+
+    const placeholderFoto = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='90' height='120'>
+        <rect width='100%' height='100%' fill='#fff3b0'/>
+        <text x='50%' y='48%' text-anchor='middle' font-size='30'>🐝</text>
+        <text x='50%' y='70%' text-anchor='middle' font-size='14' fill='#9a6400'>Foto</text>
+      </svg>
+    `);
+
+    window.login = async function () {
+      const email = emailInput.value.trim();
+      const senha = senhaInput.value.trim();
+      authStatus.textContent = "Entrando...";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+        authStatus.textContent = "";
+      } catch (error) {
+        authStatus.textContent = "Erro ao entrar: " + error.message;
+      }
+    };
+
+    window.cadastrar = async function () {
+      const nome = nomeInput.value.trim();
+      const foto = placeholderFoto;
+      const email = emailInput.value.trim();
+      const senha = senhaInput.value.trim();
+
+      if (!nome || !email || !senha) {
+        authStatus.textContent = "Preencha nome, email e senha.";
+        return;
+      }
+
+      authStatus.textContent = "Criando conta...";
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, senha);
+
+        await setDoc(doc(db, "users", cred.user.uid), {
+          uid: cred.user.uid,
+          nome,
+          email,
+          foto,
+          amigos: [],
+          criadoEm: serverTimestamp()
+        });
+
+        authStatus.textContent = "Conta criada com sucesso!";
+      } catch (error) {
+        authStatus.textContent = "Erro ao cadastrar: " + error.message;
+      }
+    };
+
+    window.recuperarSenha = async function () {
+      const email = emailInput.value.trim();
+
+      if (!email) {
+        authStatus.textContent = "Digite seu email para recuperar a senha.";
+        return;
+      }
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        authStatus.textContent = "Email de recuperação enviado.";
+      } catch (error) {
+        authStatus.textContent = "Erro: " + error.message;
+      }
+    };
+
+    window.sair = async function () {
+      await signOut(auth);
+    };
+
+    window.atualizarFotoPerfil = async function (event) {
+      const arquivo = event.target.files[0];
+      if (!arquivo || !usuarioAtual) return;
+
+      if (!arquivo.type.startsWith("image/")) {
+        fotoStatus.textContent = "Escolha um arquivo de imagem.";
+        return;
+      }
+
+      fotoStatus.textContent = "Carregando foto...";
+
+      try {
+        const fotoBase64 = await reduzirImagemParaBase64(arquivo);
+
+        await updateDoc(doc(db, "users", usuarioAtual.uid), {
+          foto: fotoBase64
+        });
+
+        dadosUsuario.foto = fotoBase64;
+        minhaFotoTopo.src = fotoBase64;
+        minhaFotoPerfil.src = fotoBase64;
+        fotoStatus.textContent = "Foto atualizada com sucesso!";
+      } catch (error) {
+        fotoStatus.textContent = "Erro ao atualizar foto: " + error.message;
+      }
+    };
+
+    function reduzirImagemParaBase64(arquivo) {
+      return new Promise((resolve, reject) => {
+        const leitor = new FileReader();
+
+        leitor.onload = () => {
+          const img = new Image();
+
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const maxLargura = 300;
+            const maxAltura = 400;
+            let largura = img.width;
+            let altura = img.height;
+
+            const proporcao = Math.min(maxLargura / largura, maxAltura / altura, 1);
+            largura = Math.round(largura * proporcao);
+            altura = Math.round(altura * proporcao);
+
+            canvas.width = largura;
+            canvas.height = altura;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, largura, altura);
+
+            resolve(canvas.toDataURL("image/jpeg", 0.75));
+          };
+
+          img.onerror = reject;
+          img.src = leitor.result;
+        };
+
+        leitor.onerror = reject;
+        leitor.readAsDataURL(arquivo);
+      });
+    }
+
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        usuarioAtual = user;
+        await carregarUsuario();
+        authScreen.classList.add("hidden");
+        appScreen.classList.remove("hidden");
+      } else {
+        usuarioAtual = null;
+        dadosUsuario = null;
+        authScreen.classList.remove("hidden");
+        appScreen.classList.add("hidden");
+      }
+    });
+
+    async function carregarUsuario() {
+      const ref = doc(db, "users", usuarioAtual.uid);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) return;
+
+      dadosUsuario = snap.data();
+      meuNome.textContent = dadosUsuario.nome;
+      minhaFotoTopo.src = dadosUsuario.foto || placeholderFoto;
+      minhaFotoPerfil.src = dadosUsuario.foto || placeholderFoto;
+      await carregarAmigos();
+    }
+
+    async function carregarAmigos() {
+      amigos = [];
+      const ids = dadosUsuario.amigos || [];
+
+      for (const id of ids) {
+        const amigoSnap = await getDoc(doc(db, "users", id));
+        if (amigoSnap.exists()) {
+          amigos.push(amigoSnap.data());
+        }
+      }
+
+      renderizarAmigos();
+    }
+
+    function renderizarAmigos() {
+      friendsGrid.innerHTML = "";
+
+      const inicio = paginaAtual * 12;
+      const fim = inicio + 12;
+      const amigosPagina = amigos.slice(inicio, fim);
+
+      if (amigosPagina.length === 0) {
+        friendsGrid.innerHTML = "<p>Você ainda não adicionou amigos.</p>";
+        return;
+      }
+
+      amigosPagina.forEach((amigo) => {
+        const card = document.createElement("div");
+        card.className = "friend-card";
+        card.innerHTML = `
+          <img src="${amigo.foto || placeholderFoto}" />
+          <p>${amigo.nome}</p>
+        `;
+        card.onclick = () => abrirChat(amigo);
+        friendsGrid.appendChild(card);
+      });
+    }
+
+    window.proximaPagina = function () {
+      if ((paginaAtual + 1) * 12 < amigos.length) {
+        paginaAtual++;
+        renderizarAmigos();
+      }
+    };
+
+    window.paginaAnterior = function () {
+      if (paginaAtual > 0) {
+        paginaAtual--;
+        renderizarAmigos();
+      }
+    };
+
+    window.pesquisarUsuarios = async function () {
+      const texto = pesquisaAmigos.value.trim().toLowerCase();
+      searchResults.innerHTML = "";
+
+      if (texto.length < 2) return;
+
+      const usersRef = collection(db, "users");
+      const snap = await getDocs(usersRef);
+
+      snap.forEach((docSnap) => {
+        const user = docSnap.data();
+        const jaSouEu = user.uid === usuarioAtual.uid;
+        const jaEhAmigo = (dadosUsuario.amigos || []).includes(user.uid);
+        const bateNome = user.nome?.toLowerCase().includes(texto);
+        const bateEmail = user.email?.toLowerCase().includes(texto);
+
+        if (!jaSouEu && !jaEhAmigo && (bateNome || bateEmail)) {
+          const item = document.createElement("div");
+          item.className = "result-item";
+          item.innerHTML = `
+            <img src="${user.foto || placeholderFoto}" />
+            <div>
+              <strong>${user.nome}</strong><br />
+              <small>${user.email}</small>
+            </div>
+            <button>Adicionar</button>
+          `;
+          item.querySelector("button").onclick = () => adicionarAmigo(user.uid);
+          searchResults.appendChild(item);
+        }
+      });
+    };
+
+    async function adicionarAmigo(idAmigo) {
+      const meusAmigos = dadosUsuario.amigos || [];
+
+      if (!meusAmigos.includes(idAmigo)) {
+        meusAmigos.push(idAmigo);
+        await updateDoc(doc(db, "users", usuarioAtual.uid), {
+          amigos: meusAmigos
+        });
+      }
+
+      await carregarUsuario();
+      await pesquisarUsuarios();
+    }
+
+    function gerarChatId(id1, id2) {
+      return [id1, id2].sort().join("_");
+    }
+
+    window.abrirChat = async function (amigo) {
+      amigoChat = amigo;
+      chatIdAtual = gerarChatId(usuarioAtual.uid, amigo.uid);
+
+      chatPanel.classList.remove("hidden");
+      chatFoto.src = amigo.foto || placeholderFoto;
+      chatNome.textContent = amigo.nome;
+      messages.innerHTML = "";
+
+      await setDoc(doc(db, "chats", chatIdAtual), {
+        participantes: [usuarioAtual.uid, amigo.uid]
+      }, { merge: true });
+
+      if (unsubscribeMessages) unsubscribeMessages();
+      if (unsubscribeTyping) unsubscribeTyping();
+
+      const mensagensRef = collection(db, "messages");
+      const q = query(
+        mensagensRef,
+        where("chatId", "==", chatIdAtual),
+        orderBy("createdAt", "asc")
+      );
+
+      unsubscribeMessages = onSnapshot(q, (snap) => {
+        messages.innerHTML = "";
+
+        snap.forEach((docSnap) => {
+          const msg = docSnap.data();
+          const div = document.createElement("div");
+          const minha = msg.senderId === usuarioAtual.uid;
+          div.className = "message " + (minha ? "mine" : "theirs");
+
+          const tempo = msg.createdAt?.toDate ? msg.createdAt.toDate() : new Date();
+          const podeApagar = minha && Date.now() - tempo.getTime() <= 7000;
+
+          div.innerHTML = `
+            ${msg.texto}
+            <small>${tempo.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</small>
+            ${podeApagar ? `<button class="delete-msg">Apagar</button>` : ""}
+          `;
+
+          const botao = div.querySelector("button");
+          if (botao) botao.onclick = () => apagarMensagem(docSnap.id, tempo);
+
+          messages.appendChild(div);
+        });
+
+        messages.scrollTop = messages.scrollHeight;
+      });
+
+      unsubscribeTyping = onSnapshot(doc(db, "chats", chatIdAtual), (snap) => {
+        const data = snap.data();
+        const digitando = data?.digitando?.[amigo.uid];
+        typingStatus.textContent = digitando ? `${amigo.nome} está digitando...` : "";
+      });
+    };
+
+    window.enviarMensagem = async function () {
+      const texto = messageInput.value.trim();
+      if (!texto || !chatIdAtual) return;
+
+      await addDoc(collection(db, "messages"), {
+        chatId: chatIdAtual,
+        senderId: usuarioAtual.uid,
+        receiverId: amigoChat.uid,
+        texto,
+        createdAt: serverTimestamp()
+      });
+
+      messageInput.value = "";
+      await pararDigitando();
+    };
+
+    async function apagarMensagem(messageId, tempo) {
+      if (Date.now() - tempo.getTime() > 7000) {
+        alert("Só é possível apagar a mensagem em até 7 segundos.");
+        return;
+      }
+
+      await deleteDoc(doc(db, "messages", messageId));
+    }
+
+    window.marcarDigitando = async function () {
+      if (!chatIdAtual || !usuarioAtual) return;
+
+      await setDoc(doc(db, "chats", chatIdAtual), {
+        digitando: {
+          [usuarioAtual.uid]: true
+        }
+      }, { merge: true });
+
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(pararDigitando, 1200);
+    };
+
+    async function pararDigitando() {
+      if (!chatIdAtual || !usuarioAtual) return;
+
+      await setDoc(doc(db, "chats", chatIdAtual), {
+        digitando: {
+          [usuarioAtual.uid]: false
+        }
+      }, { merge: true });
+    }
+  </script>
+</body>
+</html>
