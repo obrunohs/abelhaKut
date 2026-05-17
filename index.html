@@ -524,6 +524,44 @@
       </svg>
     `);
 
+    const authScreen = document.getElementById("authScreen");
+    const appScreen = document.getElementById("appScreen");
+    const loginBox = document.getElementById("loginBox");
+    const cadastroBox = document.getElementById("cadastroBox");
+    const authStatus = document.getElementById("authStatus");
+
+    const loginEmailInput = document.getElementById("loginEmailInput");
+    const loginSenhaInput = document.getElementById("loginSenhaInput");
+    const cadastroNomeInput = document.getElementById("cadastroNomeInput");
+    const cadastroEmailInput = document.getElementById("cadastroEmailInput");
+    const cadastroSenhaInput = document.getElementById("cadastroSenhaInput");
+    const cadastroNascimentoInput = document.getElementById("cadastroNascimentoInput");
+    const maior16Input = document.getElementById("maior16Input");
+
+    const minhaFotoTopo = document.getElementById("minhaFotoTopo");
+    const minhaFotoPerfil = document.getElementById("minhaFotoPerfil");
+    const meuNome = document.getElementById("meuNome");
+    const fotoStatus = document.getElementById("fotoStatus");
+
+    const pesquisaAmigos = document.getElementById("pesquisaAmigos");
+    const friendsGrid = document.getElementById("friendsGrid");
+    const searchResults = document.getElementById("searchResults");
+    const chatPanel = document.getElementById("chatPanel");
+    const chatFoto = document.getElementById("chatFoto");
+    const chatNome = document.getElementById("chatNome");
+    const messages = document.getElementById("messages");
+    const typingStatus = document.getElementById("typingStatus");
+    const messageInput = document.getElementById("messageInput");
+
+    function esperarComTempoLimite(promessa, segundos, mensagem) {
+      return Promise.race([
+        promessa,
+        new Promise((_, reject) => {
+          setTimeout(() => reject(new Error(mensagem)), segundos * 1000);
+        })
+      ]);
+    }
+
     window.mostrarCadastro = function () {
       loginBox.classList.add("hidden");
       cadastroBox.classList.remove("hidden");
@@ -600,32 +638,106 @@
         return;
       }
 
+      if (senha.length < 6) {
+        authStatus.textContent = "A senha precisa ter pelo menos 6 caracteres.";
+        return;
+      }
+
       authStatus.textContent = "Criando conta...";
 
       try {
-        const cred = await createUserWithEmailAndPassword(auth, email, senha);
+        const cred = await esperarComTempoLimite(
+          createUserWithEmailAndPassword(auth, email, senha),
+          15,
+          "O Firebase demorou para criar a conta. Confira sua internet e tente novamente."
+        );
 
-        await setDoc(doc(db, "users", cred.user.uid), {
-          uid: cred.user.uid,
-          nome,
-          email,
-          nascimento,
-          maior16,
-          foto,
-          amigos: [],
-          criadoEm: serverTimestamp()
-        });
+        authStatus.textContent = "Conta criada. Enviando link de confirmação...";
 
-        await sendEmailVerification(cred.user, {
-          url: window.location.href.split("?")[0],
-          handleCodeInApp: true
-        });
+        await esperarComTempoLimite(
+          sendEmailVerification(cred.user, {
+            url: window.location.origin + window.location.pathname,
+            handleCodeInApp: true
+          }),
+          15,
+          "A conta foi criada, mas o envio do link demorou demais. Tente recuperar/reenviar depois."
+        );
+
+        authStatus.textContent = "Salvando seu perfil...";
+
+        try {
+          await esperarComTempoLimite(
+            setDoc(doc(db, "users", cred.user.uid), {
+              uid: cred.user.uid,
+              nome,
+              email,
+              nascimento,
+              maior16,
+              foto,
+              amigos: [],
+              criadoEm: serverTimestamp()
+            }),
+            15,
+            "O perfil demorou para salvar no banco de dados."
+          );
+        } catch (erroBanco) {
+          console.error("Erro ao salvar perfil:", erroBanco);
+        }
 
         await signOut(auth);
         mostrarLogin();
-        authStatus.textContent = "Enviamos um link de confirmação para seu email. Clique no link para autenticar sua conta.";
+        authStatus.textContent =
+          "Enviamos um link de confirmação para seu email. Clique no link para autenticar sua conta antes de entrar.";
       } catch (error) {
-        authStatus.textContent = "Erro ao cadastrar: " + error.message;
+        console.error("Erro no cadastro:", error);
+
+        if (error.code === "auth/email-already-in-use") {
+          try {
+            const loginExistente = await signInWithEmailAndPassword(auth, email, senha);
+            await loginExistente.user.reload();
+
+            if (!loginExistente.user.emailVerified) {
+              await sendEmailVerification(loginExistente.user, {
+                url: window.location.origin + window.location.pathname,
+                handleCodeInApp: true
+              });
+
+              await signOut(auth);
+              mostrarLogin();
+              authStatus.textContent =
+                "Esse email já estava cadastrado, mas ainda não confirmado. Enviamos um novo link de confirmação para seu email.";
+              return;
+            }
+
+            await signOut(auth);
+            mostrarLogin();
+            authStatus.textContent =
+              "Este email já está cadastrado e confirmado. Entre usando seu email e senha.";
+            return;
+          } catch (erroLoginExistente) {
+            authStatus.textContent =
+              "Este email já está cadastrado no abelhaKut. Tente entrar ou recuperar sua senha.";
+            return;
+          }
+        }
+
+        if (error.code === "auth/invalid-email") {
+          authStatus.textContent = "Digite um email válido.";
+          return;
+        }
+
+        if (error.code === "auth/weak-password") {
+          authStatus.textContent = "A senha precisa ter pelo menos 6 caracteres.";
+          return;
+        }
+
+        if (error.code === "auth/network-request-failed") {
+          authStatus.textContent = "Falha de internet. Verifique sua conexão e tente novamente.";
+          return;
+        }
+
+        authStatus.textContent =
+          "Não foi possível criar sua conta agora. Erro: " + (error.message || error);
       }
     };
 
@@ -738,9 +850,25 @@
       const ref = doc(db, "users", usuarioAtual.uid);
       const snap = await getDoc(ref);
 
-      if (!snap.exists()) return;
-
-      dadosUsuario = snap.data();
+      if (!snap.exists()) {
+        await setDoc(ref, {
+          uid: usuarioAtual.uid,
+          nome: usuarioAtual.email.split("@")[0],
+          email: usuarioAtual.email,
+          foto: placeholderFoto,
+          amigos: [],
+          criadoEm: serverTimestamp()
+        });
+        dadosUsuario = {
+          uid: usuarioAtual.uid,
+          nome: usuarioAtual.email.split("@")[0],
+          email: usuarioAtual.email,
+          foto: placeholderFoto,
+          amigos: []
+        };
+      } else {
+        dadosUsuario = snap.data();
+      }
       meuNome.textContent = dadosUsuario.nome;
       minhaFotoTopo.src = dadosUsuario.foto || placeholderFoto;
       minhaFotoPerfil.src = dadosUsuario.foto || placeholderFoto;
