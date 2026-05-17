@@ -536,6 +536,231 @@
         grid-template-columns: repeat(2, 1fr);
       }
     }
+
+
+    /* ===== Layout reorganizado ===== */
+    .app {
+      padding: 14px;
+    }
+
+    header {
+      max-width: 1180px;
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      margin-bottom: 18px;
+      padding: 12px 16px;
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-area h1 {
+      font-size: 24px;
+      white-space: nowrap;
+    }
+
+    .top-search {
+      flex: 1;
+      max-width: 420px;
+      margin: 0 12px;
+    }
+
+    .top-search input {
+      margin: 0;
+      border-radius: 999px;
+      background: #fffaf0;
+      border: 1px solid #f0dfb8;
+    }
+
+    .header-actions {
+      position: relative;
+    }
+
+    .notification-dropdown {
+      position: absolute;
+      top: 58px;
+      right: 0;
+      width: min(360px, calc(100vw - 32px));
+      max-height: 430px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #f0dfb8;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 16px 35px rgba(0,0,0,0.18);
+      z-index: 80;
+    }
+
+    .notification-section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #9a6400;
+      margin: 6px 0;
+    }
+
+    .main-layout {
+      max-width: 1180px;
+      grid-template-columns: 300px 1fr;
+      align-items: start;
+    }
+
+    .profile-panel {
+      padding: 16px;
+    }
+
+    .profile-row img {
+      width: 58px;
+      height: 74px;
+    }
+
+    .friends-grid {
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 10px;
+      min-height: 240px;
+    }
+
+    .friend-card {
+      padding: 9px;
+      border-radius: 16px;
+      cursor: default;
+    }
+
+    .friend-card img {
+      width: 58px;
+      height: 72px;
+      margin-bottom: 6px;
+    }
+
+    .friend-card p {
+      font-size: 13px;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .friend-actions {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .friend-actions button {
+      margin: 0;
+      padding: 7px 8px;
+      font-size: 12px;
+      border-radius: 999px;
+    }
+
+    .remove-friend-btn {
+      background: #fff3b0;
+      color: #8a5a00;
+      border: 1px solid #ffd166;
+    }
+
+    #chatPanel.chat-panel {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: min(390px, calc(100vw - 28px));
+      max-height: calc(100vh - 100px);
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      z-index: 70;
+      border-radius: 22px;
+      animation: chatPop .22s ease;
+    }
+
+    .chat-user {
+      margin: 0;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #f7a800, #ffbf2f);
+      color: #fff;
+      border-bottom: none;
+    }
+
+    .chat-user img {
+      width: 44px;
+      height: 56px;
+      border: 2px solid rgba(255,255,255,.6);
+    }
+
+    .chat-user h3 {
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .chat-user p {
+      font-size: 12px;
+      opacity: .9;
+    }
+
+    .close-chat-btn {
+      width: 34px !important;
+      height: 34px;
+      margin: 0 0 0 auto !important;
+      padding: 0 !important;
+      border-radius: 999px;
+      background: rgba(255,255,255,.25);
+      color: #fff;
+      font-size: 18px;
+    }
+
+    #chatPanel .messages {
+      height: 315px;
+      border: none;
+      border-radius: 0;
+      margin: 0;
+    }
+
+    #chatPanel .typing {
+      padding: 0 14px;
+    }
+
+    #chatPanel .emoji-picker {
+      margin: 0 12px 8px;
+    }
+
+    #chatPanel .chat-input {
+      margin: 0 12px 12px;
+    }
+
+    @keyframes chatPop {
+      from { opacity: 0; transform: translateY(16px) scale(.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        flex-wrap: wrap;
+        top: 0;
+        border-radius: 0 0 18px 18px;
+      }
+
+      .top-search {
+        order: 3;
+        max-width: none;
+        width: 100%;
+        margin: 8px 0 0;
+      }
+
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .friends-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -574,8 +799,17 @@
 
   <section id="appScreen" class="app hidden">
     <header>
-      <h1>🐝 abelhaKut</h1>
+      <div class="brand-area">
+        <h1>🐝 abelhaKut</h1>
+      </div>
+
+      <div class="top-search">
+        <input id="pesquisaTopo" placeholder="Buscar pessoas no abelhaKut..." oninput="sincronizarPesquisaTopo()" />
+      </div>
+
       <div class="header-actions">
+        <button class="bell-btn" onclick="alternarNotificacoes()">🔔 <span id="bellCount" class="bell-count">0</span></button>
+        <div id="notificationsBox" class="notification-dropdown hidden"></div>
         <img id="minhaFotoTopo" class="top-photo" src="" alt="Minha foto" />
         <span id="meuNome"></span>
         <button onclick="sair()">Sair</button>
@@ -598,13 +832,6 @@
           <p id="fotoStatus" class="status"></p>
         </div>
 
-        <div class="panel profile-panel">
-          <div class="friends-title-row">
-            <h3>Notificações</h3>
-            <button class="bell-btn" onclick="alternarNotificacoes()">🔔 <span id="bellCount" class="bell-count">0</span></button>
-          </div>
-          <div id="notificationsBox" class="notification-box hidden"></div>
-        </div>
 
         <div id="chatPanel" class="panel chat-panel hidden">
           <div class="chat-user">
@@ -613,6 +840,7 @@
               <h3 id="chatNome"></h3>
               <p>Chat em tempo real</p>
             </div>
+            <button class="close-chat-btn" onclick="fecharChat()">×</button>
           </div>
 
           <div id="messages" class="messages"></div>
@@ -738,6 +966,7 @@
     const meuNome = document.getElementById("meuNome");
     const fotoStatus = document.getElementById("fotoStatus");
 
+    const pesquisaTopo = document.getElementById("pesquisaTopo");
     const pesquisaAmigos = document.getElementById("pesquisaAmigos");
     const friendsGrid = document.getElementById("friendsGrid");
     const searchResults = document.getElementById("searchResults");
@@ -873,6 +1102,7 @@
               solicitacoesRecebidas: [],
               solicitacoesEnviadas: [],
               bloqueados: [],
+              unreadChats: [],
               criadoEm: serverTimestamp()
             }),
             15,
@@ -1068,6 +1298,7 @@
           solicitacoesRecebidas: [],
           solicitacoesEnviadas: [],
           bloqueados: [],
+          unreadChats: [],
           criadoEm: serverTimestamp()
         });
         dadosUsuario = {
@@ -1078,7 +1309,8 @@
           amigos: [],
           solicitacoesRecebidas: [],
           solicitacoesEnviadas: [],
-          bloqueados: []
+          bloqueados: [],
+          unreadChats: []
         };
       } else {
         dadosUsuario = snap.data();
@@ -1111,13 +1343,23 @@
       if (!dadosUsuario) return;
 
       const recebidas = dadosUsuario.solicitacoesRecebidas || [];
-      bellCount.textContent = recebidas.length;
-      bellCount.style.display = recebidas.length > 0 ? "flex" : "none";
+      const unreadChats = dadosUsuario.unreadChats || [];
+      const total = recebidas.length + unreadChats.length;
+
+      bellCount.textContent = total;
+      bellCount.style.display = total > 0 ? "flex" : "none";
       notificationsBox.innerHTML = "";
 
-      if (recebidas.length === 0) {
-        notificationsBox.innerHTML = "<p class='status'>Nenhuma solicitação de amizade agora.</p>";
+      if (total === 0) {
+        notificationsBox.innerHTML = "<p class='status'>Nenhuma notificação agora.</p>";
         return;
+      }
+
+      if (recebidas.length > 0) {
+        const title = document.createElement("div");
+        title.className = "notification-section-title";
+        title.textContent = "Solicitações de amizade";
+        notificationsBox.appendChild(title);
       }
 
       for (const id of recebidas) {
@@ -1135,6 +1377,36 @@
               <button onclick="aceitarSolicitacao('${pessoa.uid}')">Aceitar</button>
               <button class="deny-btn" onclick="negarSolicitacao('${pessoa.uid}')">Negar</button>
               <button class="block-btn" onclick="bloquearPessoa('${pessoa.uid}')">Bloquear</button>
+            </div>
+          </div>
+        `;
+        notificationsBox.appendChild(item);
+      }
+
+      if (unreadChats.length > 0) {
+        const title = document.createElement("div");
+        title.className = "notification-section-title";
+        title.textContent = "Mensagens não lidas";
+        notificationsBox.appendChild(title);
+      }
+
+      for (const chatId of unreadChats) {
+        const outroId = chatId.split("_").find((id) => id !== usuarioAtual.uid);
+        if (!outroId) continue;
+
+        const snap = await getDoc(doc(db, "users", outroId));
+        if (!snap.exists()) continue;
+        const pessoa = snap.data();
+
+        const item = document.createElement("div");
+        item.className = "notification-item";
+        item.innerHTML = `
+          <img src="${pessoa.foto || placeholderFoto}" />
+          <div>
+            <strong>${pessoa.nome}</strong><br />
+            <small>mandou uma nova mensagem</small>
+            <div class="notification-actions">
+              <button onclick="abrirChatPorId('${pessoa.uid}')">Abrir chat</button>
             </div>
           </div>
         `;
@@ -1159,8 +1431,8 @@
     function renderizarAmigos() {
       friendsGrid.innerHTML = "";
 
-      const inicio = paginaAtual * 9;
-      const fim = inicio + 9;
+      const inicio = paginaAtual * 12;
+      const fim = inicio + 12;
       const amigosPagina = amigos.slice(inicio, fim);
 
       if (amigosPagina.length === 0) {
@@ -1172,16 +1444,19 @@
         const card = document.createElement("div");
         card.className = "friend-card";
         card.innerHTML = `
-          <p>${amigo.nome}</p>
           <img src="${amigo.foto || placeholderFoto}" />
+          <p>${amigo.nome}</p>
+          <div class="friend-actions">
+            <button onclick="abrirChatPorId('${amigo.uid}')">💬 Chat</button>
+            <button class="remove-friend-btn" onclick="removerAmizade('${amigo.uid}')">Remover</button>
+          </div>
         `;
-        card.onclick = () => abrirChat(amigo);
         friendsGrid.appendChild(card);
       });
     }
 
     window.proximaPagina = function () {
-      if ((paginaAtual + 1) * 9 < amigos.length) {
+      if ((paginaAtual + 1) * 12 < amigos.length) {
         paginaAtual++;
         renderizarAmigos();
       }
@@ -1192,6 +1467,11 @@
         paginaAtual--;
         renderizarAmigos();
       }
+    };
+
+    window.sincronizarPesquisaTopo = function () {
+      pesquisaAmigos.value = pesquisaTopo.value;
+      pesquisarUsuarios();
     };
 
     window.pesquisarUsuarios = async function () {
@@ -1299,6 +1579,51 @@
       await carregarUsuario();
     };
 
+    window.removerAmizade = async function (idPessoa) {
+      if (!usuarioAtual || !idPessoa) return;
+
+      const amigo = amigos.find((p) => p.uid === idPessoa);
+      const nome = amigo?.nome || "esse amigo";
+      const confirmar = confirm(`Remover ${nome} da sua lista de amigos?`);
+      if (!confirmar) return;
+
+      await updateDoc(doc(db, "users", usuarioAtual.uid), {
+        amigos: arrayRemove(idPessoa)
+      });
+
+      await updateDoc(doc(db, "users", idPessoa), {
+        amigos: arrayRemove(usuarioAtual.uid)
+      });
+
+      if (amigoChat?.uid === idPessoa) {
+        fecharChat();
+      }
+
+      await carregarUsuario();
+    };
+
+    window.abrirChatPorId = function (idPessoa) {
+      const amigo = amigos.find((p) => p.uid === idPessoa);
+      if (amigo) abrirChat(amigo);
+    };
+
+    window.fecharChat = function () {
+      chatPanel.classList.add("hidden");
+      messages.innerHTML = "";
+      typingStatus.textContent = "";
+      if (emojiPicker) emojiPicker.classList.add("hidden");
+      if (unsubscribeMessages) {
+        unsubscribeMessages();
+        unsubscribeMessages = null;
+      }
+      if (unsubscribeTyping) {
+        unsubscribeTyping();
+        unsubscribeTyping = null;
+      }
+      amigoChat = null;
+      chatIdAtual = null;
+    };
+
     function gerarChatId(id1, id2) {
       return [id1, id2].sort().join("_");
     }
@@ -1308,9 +1633,14 @@
       chatIdAtual = gerarChatId(usuarioAtual.uid, amigo.uid);
 
       chatPanel.classList.remove("hidden");
+      notificationsBox.classList.add("hidden");
       chatFoto.src = amigo.foto || placeholderFoto;
       chatNome.textContent = amigo.nome;
       messages.innerHTML = "";
+
+      await updateDoc(doc(db, "users", usuarioAtual.uid), {
+        unreadChats: arrayRemove(chatIdAtual)
+      }).catch(() => {});
 
       await setDoc(doc(db, "chats", chatIdAtual), {
         participantes: [usuarioAtual.uid, amigo.uid]
