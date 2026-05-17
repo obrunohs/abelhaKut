@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>abelhaKut</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <section id="authScreen" class="container">
+    <div class="auth-card">
+      <div class="logo">🐝 abelhaKut</div>
+      <p class="subtitle">Sua rede social simples e divertida</p>
+
+      <div id="loginBox">
+        <input id="loginEmailInput" type="email" placeholder="E-mail" />
+        <input id="loginSenhaInput" type="password" placeholder="Senha" />
+
+        <button onclick="login()">Entrar</button>
+        <button class="link-btn" onclick="mostrarCadastro()">Ainda não é um membro abelhaKut?</button>
+        <button class="link-btn" onclick="recuperarSenha()">Recuperar senha</button>
+      </div>
+
+      <div id="cadastroBox" class="hidden">
+        <input id="cadastroNomeInput" placeholder="Nome" />
+        <input id="cadastroEmailInput" type="email" placeholder="E-mail" />
+        <input id="cadastroSenhaInput" type="password" placeholder="Senha" />
+        <input id="cadastroNascimentoInput" type="date" />
+
+        <label style="display:flex; gap:8px; align-items:center; text-align:left; margin:8px 0 14px; color:#555; font-size:14px;">
+          <input id="maior16Input" type="checkbox" style="width:auto; margin:0;" />
+          Confirmo que sou maior de 16 anos
+        </label>
+
+        <button onclick="cadastrar()">Cadastrar</button>
+        <button class="link-btn" onclick="mostrarLogin()">Voltar para login</button>
+      </div>
+
+      <p id="authStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="appScreen" class="app hidden">
+    <header>
+      <div class="brand-area">
+        <h1>🐝 abelhaKut</h1>
+      </div>
+
+      <div class="top-search">
+        <input id="pesquisaTopo" placeholder="Buscar pessoas no abelhaKut..." oninput="sincronizarPesquisaTopo()" />
+      </div>
+
+      <div class="header-actions">
+        <button class="bell-btn" onclick="alternarNotificacoes()">🔔 <span id="bellCount" class="bell-count">0</span></button>
+        <button class="bell-btn" onclick="alternarPainelAmigos()">👥 <span id="friendsTopCount" class="bell-count">0</span></button>
+        <button class="bell-btn" onclick="alternarPainelConversas()">💬 <span id="chatTopCount" class="bell-count">0</span></button>
+
+        <div id="notificationsBox" class="notification-dropdown hidden"></div>
+        <div id="friendsDropdown" class="top-dropdown hidden"></div>
+        <div id="chatsDropdown" class="top-dropdown hidden"></div>
+
+        <img id="minhaFotoTopo" class="top-photo" src="" alt="Minha foto" />
+        <span id="meuNome"></span>
+        <button onclick="sair()">Sair</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <div>
+        <div class="panel profile-panel">
+          <h3>Meu perfil</h3>
+          <div class="profile-row">
+            <img id="minhaFotoPerfil" src="" alt="Minha foto de perfil" />
+            <div>
+              <p>Foto de perfil</p>
+              <label class="upload-label" for="fotoArquivo">Enviar foto do computador</label>
+              <input id="fotoArquivo" type="file" accept="image/*" onchange="atualizarFotoPerfil(event)" hidden />
+              <small>Use uma imagem pequena para carregar melhor.</small>
+            </div>
+          </div>
+          <p id="fotoStatus" class="status"></p>
+
+          <div class="profile-extra-space">
+            <h4>Meu espaço</h4>
+            <p>Em breve: bio, status, cidade, música e recados.</p>
+          </div>
+        </div>
+
+
+        <div id="chatPanel" class="panel chat-panel hidden">
+          <div class="chat-user">
+            <img id="chatFoto" src="" alt="Foto do amigo" />
+            <div>
+              <h3 id="chatNome"></h3>
+              <p id="chatStatusLinha">Status desconhecido</p>
+            </div>
+            <button class="minimize-chat-btn" onclick="minimizarChat()">—</button>
+            <button class="close-chat-btn" onclick="fecharChat()">×</button>
+          </div>
+
+          <div id="messages" class="messages"></div>
+          <div id="typingStatus" class="typing"></div>
+
+          <div id="emojiPicker" class="emoji-picker hidden">
+            <button onclick="adicionarEmoji('😀')">😀</button>
+            <button onclick="adicionarEmoji('😂')">😂</button>
+            <button onclick="adicionarEmoji('😍')">😍</button>
+            <button onclick="adicionarEmoji('😎')">😎</button>
+            <button onclick="adicionarEmoji('😭')">😭</button>
+            <button onclick="adicionarEmoji('🔥')">🔥</button>
+            <button onclick="adicionarEmoji('❤️')">❤️</button>
+            <button onclick="adicionarEmoji('🐝')">🐝</button>
+            <button onclick="adicionarEmoji('👍')">👍</button>
+            <button onclick="adicionarEmoji('👏')">👏</button>
+          </div>
+
+          <div class="chat-input">
+            <button class="emoji-btn" onclick="alternarEmojiPicker()">😊</button>
+            <input id="messageInput" placeholder="Digite sua mensagem..." oninput="marcarDigitando()" onkeydown="if(event.key === 'Enter') enviarMensagem()" />
+            <button class="send-btn" onclick="enviarMensagem()">➤</button>
+          </div>
+        </div>
+
+        <div id="chatMinimizedBar" class="chat-minimized-bar hidden" onclick="restaurarChat()">
+          <img id="chatMinFoto" src="" alt="Foto do chat" />
+          <div>
+            <strong id="chatMinNome">Chat</strong>
+            <small>Clique para abrir a conversa</small>
+          </div>
+        </div>
+      </div>
+
+      <main class="panel feed-shell">
+        <div class="feed-empty">
+          <div class="feed-icon">🐝</div>
+          <h2>Início do abelhaKut</h2>
+          <p>A tela principal agora fica livre para o feed. Use os botões 👥 Amigos e 💬 Conversas no topo para abrir listas separadas.</p>
+        </div>
+      </main>
+    </div>
+  </section>
+  <div id="onlineToastContainer" class="online-toast-container"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
