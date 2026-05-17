@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>abelhaKut - layout final</title>
+  <title>abelhaKut</title>
 
   <style>
     * {
@@ -444,181 +444,6 @@
         grid-template-columns: repeat(2, 1fr);
       }
     }
-
-
-    /* ===== Layout novo estilo Orkut ===== */
-    .main-layout {
-      max-width: 1100px !important;
-      grid-template-columns: 340px 1fr 380px !important;
-      align-items: start;
-    }
-
-    .left-column { display: flex; flex-direction: column; gap: 18px; }
-    .center-column { display: flex; flex-direction: column; gap: 18px; }
-    .right-column { display: flex; flex-direction: column; gap: 14px; }
-
-    .icon-btn {
-      position: relative;
-      width: 42px !important;
-      height: 42px;
-      margin: 0 !important;
-      padding: 0 !important;
-      border-radius: 999px;
-      background: #fff3b0;
-      color: #8a5a00;
-      border: 1px solid #ffd166;
-      font-size: 18px;
-    }
-
-    .icon-count {
-      position: absolute;
-      top: -7px;
-      right: -7px;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 5px;
-      border-radius: 999px;
-      background: #e63946;
-      color: #fff;
-      font-size: 12px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .floating-box {
-      position: absolute;
-      right: 140px;
-      top: 78px;
-      width: 330px;
-      max-height: 360px;
-      overflow-y: auto;
-      background: #fff;
-      border: 1px solid #ffd166;
-      border-radius: 14px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.22);
-      padding: 12px;
-      z-index: 20;
-    }
-
-    .floating-box h3 { color:#cf7d00; margin-bottom:10px; }
-
-    .chat-panel {
-      display: flex;
-      flex-direction: column;
-      min-height: 470px;
-      margin-top: 0 !important;
-      border: 5px solid #3f3ed6;
-      border-radius: 0;
-      padding: 0;
-      overflow: hidden;
-      box-shadow: none;
-    }
-
-    .chat-empty {
-      min-height: 470px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      color:#777;
-      border: 5px solid #3f3ed6;
-      background:white;
-      padding:20px;
-    }
-
-    .chat-user {
-      background:#3f3ed6;
-      color:white;
-      padding:8px 10px;
-      margin:0 !important;
-      border-bottom:0 !important;
-      justify-content: space-between;
-    }
-
-    .chat-user-left { display:flex; align-items:center; gap:10px; }
-    .chat-user img { width:42px !important; height:54px !important; border:2px solid white; }
-    .chat-user h3 { color:white !important; margin:0 !important; text-transform: uppercase; }
-    .close-chat { width:auto !important; margin:0 !important; background:transparent !important; color:#ff2b2b !important; font-size:24px; padding:4px 8px !important; }
-
-    .messages {
-      flex:1;
-      height: 330px !important;
-      border-radius:0 !important;
-      border:0 !important;
-      background:white !important;
-      margin:0 !important;
-    }
-
-    .message { cursor:pointer; border:1px solid rgba(0,0,0,.08); }
-    .mine { background:#ffcc46 !important; color:#222 !important; border:1px solid #f0a500; }
-    .theirs { background:#f2f2ff !important; border:1px solid #b7b7ff !important; }
-    .delete-msg { display:none; background:#d62828 !important; color:white !important; }
-    .message.show-delete .delete-msg { display:inline-block; }
-
-    .chat-input {
-      padding:8px;
-      border-top:5px solid #3f3ed6;
-      background:white;
-    }
-
-    .chat-input button {
-      background:#2f9df4;
-      font-size:0;
-      width:82px !important;
-    }
-    .chat-input button::after { content:'➤'; font-size:30px; line-height:1; }
-
-    .friends-panel { min-height: 470px; }
-    .friends-grid {
-      grid-template-columns: repeat(3, 1fr) !important;
-      gap: 10px !important;
-      min-height: 268px !important;
-      border:4px solid #3f3ed6;
-      padding:12px;
-      background:#fffaf0;
-      align-items:start;
-    }
-
-    .friend-card {
-      padding:4px !important;
-      border:0 !important;
-      background:transparent !important;
-      box-shadow:none !important;
-      border-radius:8px !important;
-      min-height:auto;
-    }
-
-    .friend-card p {
-      margin-bottom:5px !important;
-      color:#9a6400;
-      font-size:13px !important;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .friend-card img {
-      width:78px !important;
-      height:98px !important;
-      margin-bottom:0 !important;
-      border-radius:7px !important;
-    }
-
-    .search-box {
-      max-width: 360px !important;
-      margin-bottom: 14px !important;
-    }
-
-    .pagination button { font-size:0; }
-    .pagination button:first-child::after { content:'⬅'; font-size:26px; color:white; }
-    .pagination button:last-child::after { content:'➡'; font-size:26px; color:white; }
-
-    @media (max-width: 1050px) {
-      .main-layout { grid-template-columns: 1fr !important; }
-      .floating-box { right:20px; top:80px; }
-    }
-
   </style>
 </head>
 <body>
@@ -658,20 +483,15 @@
   <section id="appScreen" class="app hidden">
     <header>
       <h1>🐝 abelhaKut</h1>
-      <small style="color:#999;font-size:11px;margin-left:auto;display:none;">layout-final-v3</small>
       <div class="header-actions">
-        <button class="icon-btn" onclick="alternarNotificacoes()" title="Solicitações de amizade">🔔<span id="bellCount" class="icon-count">0</span></button>
-        <button class="icon-btn" onclick="alternarMensagens()" title="Mensagens">💬<span id="messageCount" class="icon-count">0</span></button>
         <img id="minhaFotoTopo" class="top-photo" src="" alt="Minha foto" />
         <span id="meuNome"></span>
         <button onclick="sair()">Sair</button>
       </div>
-      <div id="notificationsBox" class="floating-box hidden"></div>
-      <div id="messagesNotifyBox" class="floating-box hidden"></div>
     </header>
 
     <div class="main-layout">
-      <div class="left-column">
+      <div>
         <div class="panel profile-panel">
           <h3>Meu perfil</h3>
           <div class="profile-row">
@@ -685,23 +505,22 @@
           </div>
           <p id="fotoStatus" class="status"></p>
         </div>
-      </div>
 
-      <div class="center-column">
-        <div id="chatEmpty" class="chat-empty">
-          <p>Clique em um amigo para abrir o XAT.</p>
+        <div class="panel profile-panel">
+          <div class="friends-title-row">
+            <h3>Notificações</h3>
+            <button class="bell-btn" onclick="alternarNotificacoes()">🔔 <span id="bellCount" class="bell-count">0</span></button>
+          </div>
+          <div id="notificationsBox" class="notification-box hidden"></div>
         </div>
 
         <div id="chatPanel" class="panel chat-panel hidden">
           <div class="chat-user">
-            <div class="chat-user-left">
-              <img id="chatFoto" src="" alt="Foto do amigo" />
-              <div>
-                <h3 id="chatNome"></h3>
-                <p>XAT</p>
-              </div>
+            <img id="chatFoto" src="" alt="Foto do amigo" />
+            <div>
+              <h3 id="chatNome"></h3>
+              <p>Chat em tempo real</p>
             </div>
-            <button class="close-chat" onclick="fecharChat()">X</button>
           </div>
 
           <div id="messages" class="messages"></div>
@@ -714,20 +533,18 @@
         </div>
       </div>
 
-      <div class="right-column">
-        <div class="panel friends-panel">
-          <div class="friends-title-row">
-            <h2>Meus amigos</h2>
-          </div>
-          <input id="pesquisaAmigos" class="search-box" placeholder="Pesquisar amigos ou pessoas..." oninput="pesquisarUsuarios()" />
-          <div id="searchResults"></div>
-          <br />
-          <div id="friendsGrid" class="friends-grid"></div>
+      <div class="panel">
+        <div class="friends-title-row">
+          <h2>Meus amigos</h2>
+        </div>
+        <input id="pesquisaAmigos" class="search-box" placeholder="Pesquisar amigos..." oninput="pesquisarUsuarios()" />
+        <div id="searchResults"></div>
+        <br />
+        <div id="friendsGrid" class="friends-grid"></div>
 
-          <div class="pagination">
-            <button onclick="paginaAnterior()">← Anterior</button>
-            <button onclick="proximaPagina()">Próxima →</button>
-          </div>
+        <div class="pagination">
+          <button onclick="paginaAnterior()">← Anterior</button>
+          <button onclick="proximaPagina()">Próxima →</button>
         </div>
       </div>
     </div>
@@ -824,9 +641,6 @@
     const chatFoto = document.getElementById("chatFoto");
     const chatNome = document.getElementById("chatNome");
     const messages = document.getElementById("messages");
-    const chatEmpty = document.getElementById("chatEmpty");
-    const messagesNotifyBox = document.getElementById("messagesNotifyBox");
-    const messageCount = document.getElementById("messageCount");
     const typingStatus = document.getElementById("typingStatus");
     const messageInput = document.getElementById("messageInput");
 
@@ -1105,87 +919,6 @@
     }
 
 
-
-
-    function iniciarMonitorDeMensagens() {
-      if (unsubscribeUnread) unsubscribeUnread();
-      if (!usuarioAtual) return;
-
-      const q = query(
-        collection(db, "messages"),
-        where("receiverId", "==", usuarioAtual.uid),
-        where("lida", "==", false)
-      );
-
-      unsubscribeUnread = onSnapshot(q, async (snap) => {
-        const porAmigo = {};
-        snap.forEach((docSnap) => {
-          const msg = docSnap.data();
-          if (!porAmigo[msg.senderId]) porAmigo[msg.senderId] = { total: 0, ultima: msg, ids: [] };
-          porAmigo[msg.senderId].total++;
-          porAmigo[msg.senderId].ids.push(docSnap.id);
-          porAmigo[msg.senderId].ultima = msg;
-        });
-
-        const total = snap.size;
-        if (total > 0) {
-          messageCount.style.display = "flex";
-          messageCount.textContent = total > 99 ? "99+" : total;
-        } else {
-          messageCount.style.display = "none";
-          messageCount.textContent = "0";
-        }
-
-        await renderizarNotificacoesDeMensagem(porAmigo);
-      }, (error) => {
-        messagesNotifyBox.innerHTML = `<h3>Mensagens</h3><p class='status'>Erro ao carregar notificações: ${error.message}</p>`;
-      });
-    }
-
-    async function renderizarNotificacoesDeMensagem(porAmigo) {
-      messagesNotifyBox.innerHTML = "<h3>Mensagens</h3>";
-      const ids = Object.keys(porAmigo);
-
-      if (ids.length === 0) {
-        messagesNotifyBox.innerHTML += "<p class='status'>Nenhuma mensagem nova.</p>";
-        return;
-      }
-
-      for (const id of ids) {
-        const amigoSnap = await getDoc(doc(db, "users", id));
-        const amigo = amigoSnap.exists() ? amigoSnap.data() : { uid: id, nome: "Amigo", foto: placeholderFoto };
-        const item = document.createElement("div");
-        item.className = "notification-item";
-        item.innerHTML = `
-          <img src="${amigo.foto || placeholderFoto}" />
-          <div style="flex:1; cursor:pointer;">
-            <strong>${amigo.nome}</strong><br />
-            <small>${porAmigo[id].total} mensagem(ns) nova(s)</small><br />
-            <small>${porAmigo[id].ultima.texto || "Nova mensagem"}</small>
-          </div>
-        `;
-        item.onclick = async () => {
-          messagesNotifyBox.classList.add("hidden");
-          await abrirChat(amigo);
-        };
-        messagesNotifyBox.appendChild(item);
-      }
-    }
-
-    async function marcarMensagensComoLidas(idAmigo) {
-      if (!usuarioAtual) return;
-      const q = query(
-        collection(db, "messages"),
-        where("senderId", "==", idAmigo),
-        where("receiverId", "==", usuarioAtual.uid),
-        where("lida", "==", false)
-      );
-      const snap = await getDocs(q);
-      for (const docSnap of snap.docs) {
-        await updateDoc(doc(db, "messages", docSnap.id), { lida: true });
-      }
-    }
-
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         await user.reload();
@@ -1197,7 +930,6 @@
 
         usuarioAtual = user;
         await carregarUsuario();
-        iniciarMonitorDeMensagens();
         authScreen.classList.add("hidden");
         appScreen.classList.remove("hidden");
       } else {
@@ -1205,7 +937,6 @@
           unsubscribeUsuario();
           unsubscribeUsuario = null;
         }
-        if (unsubscribeUnread) unsubscribeUnread();
         usuarioAtual = null;
         dadosUsuario = null;
         authScreen.classList.remove("hidden");
@@ -1266,13 +997,7 @@
     }
 
     window.alternarNotificacoes = function () {
-      messagesNotifyBox.classList.add("hidden");
       notificationsBox.classList.toggle("hidden");
-    };
-
-    window.alternarMensagens = function () {
-      notificationsBox.classList.add("hidden");
-      messagesNotifyBox.classList.toggle("hidden");
     };
 
     async function renderizarNotificacoes() {
@@ -1471,25 +1196,10 @@
       return [id1, id2].sort().join("_");
     }
 
-
-    window.fecharChat = async function () {
-      if (unsubscribeMessages) unsubscribeMessages();
-      if (unsubscribeTyping) unsubscribeTyping();
-      unsubscribeMessages = null;
-      unsubscribeTyping = null;
-      amigoChat = null;
-      chatIdAtual = null;
-      messages.innerHTML = "";
-      typingStatus.textContent = "";
-      chatPanel.classList.add("hidden");
-      chatEmpty.classList.remove("hidden");
-    };
-
     window.abrirChat = async function (amigo) {
       amigoChat = amigo;
       chatIdAtual = gerarChatId(usuarioAtual.uid, amigo.uid);
 
-      chatEmpty.classList.add("hidden");
       chatPanel.classList.remove("hidden");
       chatFoto.src = amigo.foto || placeholderFoto;
       chatNome.textContent = amigo.nome;
@@ -1498,8 +1208,6 @@
       await setDoc(doc(db, "chats", chatIdAtual), {
         participantes: [usuarioAtual.uid, amigo.uid]
       }, { merge: true });
-
-      await marcarMensagensComoLidas(amigo.uid);
 
       if (unsubscribeMessages) unsubscribeMessages();
       if (unsubscribeTyping) unsubscribeTyping();
