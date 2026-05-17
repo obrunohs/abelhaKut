@@ -607,8 +607,15 @@
 
     .main-layout {
       max-width: 1180px;
-      grid-template-columns: 300px 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 560px);
       align-items: start;
+    }
+
+    .friends-panel {
+      width: 100%;
+      max-width: 560px;
+      justify-self: end;
+      padding: 16px;
     }
 
     .profile-panel {
@@ -621,29 +628,31 @@
     }
 
     .friends-grid {
-      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
-      gap: 10px;
-      min-height: 240px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      min-height: 170px;
     }
 
     .friend-card {
-      padding: 9px;
-      border-radius: 16px;
+      padding: 8px;
+      border-radius: 14px;
       cursor: default;
     }
 
     .friend-card img {
-      width: 58px;
-      height: 72px;
-      margin-bottom: 6px;
+      width: 48px;
+      height: 60px;
+      margin-bottom: 5px;
     }
 
     .friend-card p {
-      font-size: 13px;
-      min-height: 34px;
+      font-size: 12px;
+      min-height: 28px;
+      line-height: 1.15;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow-wrap: anywhere;
     }
 
     .friend-actions {
@@ -654,8 +663,8 @@
 
     .friend-actions button {
       margin: 0;
-      padding: 7px 8px;
-      font-size: 12px;
+      padding: 6px 7px;
+      font-size: 11px;
       border-radius: 999px;
     }
 
@@ -754,6 +763,10 @@
 
       .main-layout {
         grid-template-columns: 1fr;
+      }
+
+      .friends-panel {
+        max-width: none;
       }
 
       .friends-grid {
@@ -867,7 +880,7 @@
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel friends-panel">
         <div class="friends-title-row">
           <h2>Meus amigos</h2>
         </div>
@@ -1416,13 +1429,20 @@
 
     async function carregarAmigos() {
       amigos = [];
-      const ids = dadosUsuario.amigos || [];
+      const ids = [...new Set(dadosUsuario.amigos || [])];
 
       for (const id of ids) {
         const amigoSnap = await getDoc(doc(db, "users", id));
         if (amigoSnap.exists()) {
-          amigos.push(amigoSnap.data());
+          const amigoData = amigoSnap.data();
+          if (!amigos.some((a) => a.uid === amigoData.uid)) {
+            amigos.push(amigoData);
+          }
         }
+      }
+
+      if (paginaAtual > 0 && paginaAtual * 9 >= amigos.length) {
+        paginaAtual = Math.max(0, Math.ceil(amigos.length / 9) - 1);
       }
 
       renderizarAmigos();
@@ -1431,8 +1451,8 @@
     function renderizarAmigos() {
       friendsGrid.innerHTML = "";
 
-      const inicio = paginaAtual * 12;
-      const fim = inicio + 12;
+      const inicio = paginaAtual * 9;
+      const fim = inicio + 9;
       const amigosPagina = amigos.slice(inicio, fim);
 
       if (amigosPagina.length === 0) {
@@ -1456,7 +1476,7 @@
     }
 
     window.proximaPagina = function () {
-      if ((paginaAtual + 1) * 12 < amigos.length) {
+      if ((paginaAtual + 1) * 9 < amigos.length) {
         paginaAtual++;
         renderizarAmigos();
       }
@@ -1533,14 +1553,30 @@
     window.aceitarSolicitacao = async function (idPessoa) {
       if (!usuarioAtual || !idPessoa) return;
 
-      await updateDoc(doc(db, "users", usuarioAtual.uid), {
-        amigos: arrayUnion(idPessoa),
-        solicitacoesRecebidas: arrayRemove(idPessoa)
+      const meuRef = doc(db, "users", usuarioAtual.uid);
+      const pessoaRef = doc(db, "users", idPessoa);
+
+      const [meuSnap, pessoaSnap] = await Promise.all([
+        getDoc(meuRef),
+        getDoc(pessoaRef)
+      ]);
+
+      const meusDados = meuSnap.exists() ? meuSnap.data() : {};
+      const dadosPessoa = pessoaSnap.exists() ? pessoaSnap.data() : {};
+
+      const meusAmigosUnicos = [...new Set([...(meusDados.amigos || []), idPessoa])];
+      const amigosPessoaUnicos = [...new Set([...(dadosPessoa.amigos || []), usuarioAtual.uid])];
+
+      await updateDoc(meuRef, {
+        amigos: meusAmigosUnicos,
+        solicitacoesRecebidas: arrayRemove(idPessoa),
+        solicitacoesEnviadas: arrayRemove(idPessoa)
       });
 
-      await updateDoc(doc(db, "users", idPessoa), {
-        amigos: arrayUnion(usuarioAtual.uid),
-        solicitacoesEnviadas: arrayRemove(usuarioAtual.uid)
+      await updateDoc(pessoaRef, {
+        amigos: amigosPessoaUnicos,
+        solicitacoesEnviadas: arrayRemove(usuarioAtual.uid),
+        solicitacoesRecebidas: arrayRemove(usuarioAtual.uid)
       });
 
       await carregarUsuario();
