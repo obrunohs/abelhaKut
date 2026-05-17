@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>abelhaKut</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <section id="authScreen" class="container">
+    <div class="auth-card">
+      <div class="logo">🐝 abelhaKut</div>
+      <p class="subtitle">Sua rede social simples e divertida</p>
+
+      <div id="loginBox">
+        <input id="loginEmailInput" type="email" placeholder="E-mail" />
+        <input id="loginSenhaInput" type="password" placeholder="Senha" />
+
+        <button onclick="login()">Entrar</button>
+        <button class="link-btn" onclick="mostrarCadastro()">Ainda não é um membro abelhaKut?</button>
+        <button class="link-btn" onclick="recuperarSenha()">Recuperar senha</button>
+      </div>
+
+      <div id="cadastroBox" class="hidden">
+        <input id="cadastroNomeInput" placeholder="Nome" />
+        <input id="cadastroEmailInput" type="email" placeholder="E-mail" />
+        <input id="cadastroSenhaInput" type="password" placeholder="Senha" />
+        <input id="cadastroNascimentoInput" type="date" />
+
+        <label style="display:flex; gap:8px; align-items:center; text-align:left; margin:8px 0 14px; color:#555; font-size:14px;">
+          <input id="maior16Input" type="checkbox" style="width:auto; margin:0;" />
+          Confirmo que sou maior de 16 anos
+        </label>
+
+        <button onclick="cadastrar()">Cadastrar</button>
+        <button class="link-btn" onclick="mostrarLogin()">Voltar para login</button>
+      </div>
+
+      <p id="authStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="appScreen" class="app hidden">
+    <header>
+      <div class="brand-area">
+        <h1>🐝 abelhaKut</h1>
+      </div>
+
+      <div class="top-search">
+        <input id="pesquisaTopo" placeholder="Buscar pessoas no abelhaKut..." oninput="sincronizarPesquisaTopo()" />
+      </div>
+
+      <div class="header-actions">
+        <button class="bell-btn" onclick="alternarNotificacoes()">🔔 <span id="bellCount" class="bell-count">0</span></button>
+        <div id="notificationsBox" class="notification-dropdown hidden"></div>
+        <img id="minhaFotoTopo" class="top-photo" src="" alt="Minha foto" />
+        <span id="meuNome"></span>
+        <button onclick="sair()">Sair</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <div>
+        <div class="panel profile-panel">
+          <h3>Meu perfil</h3>
+          <div class="profile-row">
+            <img id="minhaFotoPerfil" src="" alt="Minha foto de perfil" />
+            <div>
+              <p>Foto de perfil</p>
+              <label class="upload-label" for="fotoArquivo">Enviar foto do computador</label>
+              <input id="fotoArquivo" type="file" accept="image/*" onchange="atualizarFotoPerfil(event)" hidden />
+              <small>Use uma imagem pequena para carregar melhor.</small>
+            </div>
+          </div>
+          <p id="fotoStatus" class="status"></p>
+        </div>
+
+
+        <div id="chatPanel" class="panel chat-panel hidden">
+          <div class="chat-user">
+            <img id="chatFoto" src="" alt="Foto do amigo" />
+            <div>
+              <h3 id="chatNome"></h3>
+              <p id="chatStatusLinha">Status desconhecido</p>
+            </div>
+            <button class="close-chat-btn" onclick="fecharChat()">×</button>
+          </div>
+
+          <div id="messages" class="messages"></div>
+          <div id="typingStatus" class="typing"></div>
+
+          <div id="emojiPicker" class="emoji-picker hidden">
+            <button onclick="adicionarEmoji('😀')">😀</button>
+            <button onclick="adicionarEmoji('😂')">😂</button>
+            <button onclick="adicionarEmoji('😍')">😍</button>
+            <button onclick="adicionarEmoji('😎')">😎</button>
+            <button onclick="adicionarEmoji('😭')">😭</button>
+            <button onclick="adicionarEmoji('🔥')">🔥</button>
+            <button onclick="adicionarEmoji('❤️')">❤️</button>
+            <button onclick="adicionarEmoji('🐝')">🐝</button>
+            <button onclick="adicionarEmoji('👍')">👍</button>
+            <button onclick="adicionarEmoji('👏')">👏</button>
+          </div>
+
+          <div class="chat-input">
+            <button class="emoji-btn" onclick="alternarEmojiPicker()">😊</button>
+            <input id="messageInput" placeholder="Digite sua mensagem..." oninput="marcarDigitando()" onkeydown="if(event.key === 'Enter') enviarMensagem()" />
+            <button class="send-btn" onclick="enviarMensagem()">➤</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel friends-panel-main">
+        <div class="friends-title-row">
+          <h2>Meus amigos</h2>
+        </div>
+        <input id="pesquisaAmigos" class="search-box" placeholder="Pesquisar amigos..." oninput="pesquisarUsuarios()" />
+        <div id="searchResults"></div>
+        <br />
+        <div id="friendsGrid" class="friends-grid"></div>
+
+        <div class="pagination">
+          <button onclick="paginaAnterior()">← Anterior</button>
+          <button onclick="proximaPagina()">Próxima →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div id="onlineToastContainer" class="online-toast-container"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
