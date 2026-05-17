@@ -1,0 +1,1 @@
+console.log("abelhaKut v3 iniciado 🚀");
