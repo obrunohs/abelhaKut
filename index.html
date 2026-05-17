@@ -655,10 +655,7 @@
         authStatus.textContent = "Conta criada. Enviando link de confirmação...";
 
         await esperarComTempoLimite(
-          sendEmailVerification(cred.user, {
-            url: window.location.origin + window.location.pathname,
-            handleCodeInApp: true
-          }),
+          sendEmailVerification(cred.user),
           15,
           "A conta foi criada, mas o envio do link demorou demais. Tente recuperar/reenviar depois."
         );
@@ -697,10 +694,7 @@
             await loginExistente.user.reload();
 
             if (!loginExistente.user.emailVerified) {
-              await sendEmailVerification(loginExistente.user, {
-                url: window.location.origin + window.location.pathname,
-                handleCodeInApp: true
-              });
+              await sendEmailVerification(loginExistente.user);
 
               await signOut(auth);
               mostrarLogin();
@@ -733,6 +727,12 @@
 
         if (error.code === "auth/network-request-failed") {
           authStatus.textContent = "Falha de internet. Verifique sua conexão e tente novamente.";
+          return;
+        }
+
+        if (error.code === "auth/unauthorized-continue-uri" || String(error.message || "").includes("error-code:-26")) {
+          authStatus.textContent =
+            "O Firebase bloqueou a URL do link de confirmação. Agora o código usa o envio padrão. Apague a conta criada sem confirmação e tente cadastrar novamente.";
           return;
         }
 
