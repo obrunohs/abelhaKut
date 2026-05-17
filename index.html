@@ -558,6 +558,12 @@
     window.login = async function () {
       const email = loginEmailInput.value.trim();
       const senha = loginSenhaInput.value.trim();
+
+      if (!email || !senha) {
+        authStatus.textContent = "Preencha o e-mail e a senha.";
+        return;
+      }
+
       authStatus.textContent = "Entrando...";
 
       try {
@@ -572,7 +578,7 @@
 
         authStatus.textContent = "";
       } catch (error) {
-        authStatus.textContent = "Erro ao entrar: " + error.message;
+        authStatus.textContent = "E-mail ou senha incorretos. Verifique os dados ou crie uma conta no abelhaKut.";
       }
     };
 
