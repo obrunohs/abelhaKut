@@ -130,7 +130,7 @@
       max-width: 1100px;
       margin: auto;
       display: grid;
-      grid-template-columns: 1fr 360px;
+      grid-template-columns: 340px 1fr;
       gap: 20px;
     }
 
@@ -142,14 +142,94 @@
     }
 
     .search-box {
-      margin-bottom: 18px;
+      margin-bottom: 14px;
+      max-width: 360px;
+    }
+
+    .friends-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .bell-btn {
+      position: relative;
+      width: auto;
+      padding: 9px 12px;
+      margin: 0;
+      border-radius: 999px;
+      background: #fff3b0;
+      color: #8a5a00;
+      border: 1px solid #ffd166;
+    }
+
+    .bell-count {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: #e63946;
+      color: #fff;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notification-box {
+      margin-top: 12px;
+      border-top: 1px solid #eee;
+      padding-top: 12px;
+    }
+
+    .notification-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+
+    .notification-item img {
+      width: 44px;
+      height: 56px;
+      border-radius: 7px;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 7px;
+      flex-wrap: wrap;
+    }
+
+    .notification-actions button {
+      width: auto;
+      padding: 6px 8px;
+      margin: 0;
+      font-size: 12px;
+    }
+
+    .deny-btn, .block-btn {
+      background: #777;
+    }
+
+    .block-btn {
+      background: #d62828;
     }
 
     .friends-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      min-height: 390px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      min-height: 330px;
     }
 
     .friend-card {
@@ -168,8 +248,8 @@
     }
 
     .friend-card img {
-      width: 70px;
-      height: 90px;
+      width: 78px;
+      height: 98px;
       border-radius: 8px;
       object-fit: cover;
       background: #eee;
@@ -179,6 +259,8 @@
     .friend-card p {
       font-size: 14px;
       font-weight: bold;
+      margin-bottom: 7px;
+      color: #8a5a00;
     }
 
     .pagination {
@@ -409,19 +491,6 @@
     </header>
 
     <div class="main-layout">
-      <div class="panel">
-        <input id="pesquisaAmigos" class="search-box" placeholder="Pesquisar amigo pelo nome ou email..." oninput="pesquisarUsuarios()" />
-
-        <h2>Meus amigos</h2>
-        <br />
-        <div id="friendsGrid" class="friends-grid"></div>
-
-        <div class="pagination">
-          <button onclick="paginaAnterior()">← Anterior</button>
-          <button onclick="proximaPagina()">Próxima →</button>
-        </div>
-      </div>
-
       <div>
         <div class="panel profile-panel">
           <h3>Meu perfil</h3>
@@ -437,9 +506,12 @@
           <p id="fotoStatus" class="status"></p>
         </div>
 
-        <div class="panel add-area">
-          <h3>Buscar pessoas</h3>
-          <div id="searchResults"></div>
+        <div class="panel profile-panel">
+          <div class="friends-title-row">
+            <h3>Notificações</h3>
+            <button class="bell-btn" onclick="alternarNotificacoes()">🔔 <span id="bellCount" class="bell-count">0</span></button>
+          </div>
+          <div id="notificationsBox" class="notification-box hidden"></div>
         </div>
 
         <div id="chatPanel" class="panel chat-panel hidden">
@@ -458,6 +530,21 @@
             <input id="messageInput" placeholder="Digite sua mensagem..." oninput="marcarDigitando()" onkeydown="if(event.key === 'Enter') enviarMensagem()" />
             <button onclick="enviarMensagem()">Enviar</button>
           </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="friends-title-row">
+          <h2>Meus amigos</h2>
+        </div>
+        <input id="pesquisaAmigos" class="search-box" placeholder="Pesquisar amigos..." oninput="pesquisarUsuarios()" />
+        <div id="searchResults"></div>
+        <br />
+        <div id="friendsGrid" class="friends-grid"></div>
+
+        <div class="pagination">
+          <button onclick="paginaAnterior()">← Anterior</button>
+          <button onclick="proximaPagina()">Próxima →</button>
         </div>
       </div>
     </div>
@@ -488,7 +575,8 @@
       addDoc,
       deleteDoc,
       serverTimestamp,
-      orderBy,
+      arrayUnion,
+      arrayRemove,
       onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -514,6 +602,7 @@
     let chatIdAtual = null;
     let unsubscribeMessages = null;
     let unsubscribeTyping = null;
+    let unsubscribeUsuario = null;
     let typingTimer = null;
 
     const placeholderFoto = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
@@ -546,6 +635,8 @@
     const pesquisaAmigos = document.getElementById("pesquisaAmigos");
     const friendsGrid = document.getElementById("friendsGrid");
     const searchResults = document.getElementById("searchResults");
+    const bellCount = document.getElementById("bellCount");
+    const notificationsBox = document.getElementById("notificationsBox");
     const chatPanel = document.getElementById("chatPanel");
     const chatFoto = document.getElementById("chatFoto");
     const chatNome = document.getElementById("chatNome");
@@ -672,6 +763,9 @@
               maior16,
               foto,
               amigos: [],
+              solicitacoesRecebidas: [],
+              solicitacoesEnviadas: [],
+              bloqueados: [],
               criadoEm: serverTimestamp()
             }),
             15,
@@ -839,6 +933,10 @@
         authScreen.classList.add("hidden");
         appScreen.classList.remove("hidden");
       } else {
+        if (unsubscribeUsuario) {
+          unsubscribeUsuario();
+          unsubscribeUsuario = null;
+        }
         usuarioAtual = null;
         dadosUsuario = null;
         authScreen.classList.remove("hidden");
@@ -857,6 +955,12 @@
           email: usuarioAtual.email,
           foto: placeholderFoto,
           amigos: [],
+          solicitacoesRecebidas: [],
+          solicitacoesEnviadas: [],
+          bloqueados: [],
+          solicitacoesRecebidas: [],
+          solicitacoesEnviadas: [],
+          bloqueados: [],
           criadoEm: serverTimestamp()
         });
         dadosUsuario = {
@@ -864,7 +968,10 @@
           nome: usuarioAtual.email.split("@")[0],
           email: usuarioAtual.email,
           foto: placeholderFoto,
-          amigos: []
+          amigos: [],
+          solicitacoesRecebidas: [],
+          solicitacoesEnviadas: [],
+          bloqueados: []
         };
       } else {
         dadosUsuario = snap.data();
@@ -872,7 +979,60 @@
       meuNome.textContent = dadosUsuario.nome;
       minhaFotoTopo.src = dadosUsuario.foto || placeholderFoto;
       minhaFotoPerfil.src = dadosUsuario.foto || placeholderFoto;
+      renderizarNotificacoes();
+      ouvirMeuUsuario();
       await carregarAmigos();
+    }
+
+    function ouvirMeuUsuario() {
+      if (!usuarioAtual) return;
+      if (unsubscribeUsuario) unsubscribeUsuario();
+
+      unsubscribeUsuario = onSnapshot(doc(db, "users", usuarioAtual.uid), async (snap) => {
+        if (!snap.exists()) return;
+        dadosUsuario = snap.data();
+        renderizarNotificacoes();
+        await carregarAmigos();
+      });
+    }
+
+    window.alternarNotificacoes = function () {
+      notificationsBox.classList.toggle("hidden");
+    };
+
+    async function renderizarNotificacoes() {
+      if (!dadosUsuario) return;
+
+      const recebidas = dadosUsuario.solicitacoesRecebidas || [];
+      bellCount.textContent = recebidas.length;
+      bellCount.style.display = recebidas.length > 0 ? "flex" : "none";
+      notificationsBox.innerHTML = "";
+
+      if (recebidas.length === 0) {
+        notificationsBox.innerHTML = "<p class='status'>Nenhuma solicitação de amizade agora.</p>";
+        return;
+      }
+
+      for (const id of recebidas) {
+        const snap = await getDoc(doc(db, "users", id));
+        if (!snap.exists()) continue;
+        const pessoa = snap.data();
+        const item = document.createElement("div");
+        item.className = "notification-item";
+        item.innerHTML = `
+          <img src="${pessoa.foto || placeholderFoto}" />
+          <div>
+            <strong>${pessoa.nome}</strong><br />
+            <small>enviou uma solicitação de amizade</small>
+            <div class="notification-actions">
+              <button onclick="aceitarSolicitacao('${pessoa.uid}')">Aceitar</button>
+              <button class="deny-btn" onclick="negarSolicitacao('${pessoa.uid}')">Negar</button>
+              <button class="block-btn" onclick="bloquearPessoa('${pessoa.uid}')">Bloquear</button>
+            </div>
+          </div>
+        `;
+        notificationsBox.appendChild(item);
+      }
     }
 
     async function carregarAmigos() {
@@ -892,8 +1052,8 @@
     function renderizarAmigos() {
       friendsGrid.innerHTML = "";
 
-      const inicio = paginaAtual * 12;
-      const fim = inicio + 12;
+      const inicio = paginaAtual * 9;
+      const fim = inicio + 9;
       const amigosPagina = amigos.slice(inicio, fim);
 
       if (amigosPagina.length === 0) {
@@ -905,8 +1065,8 @@
         const card = document.createElement("div");
         card.className = "friend-card";
         card.innerHTML = `
-          <img src="${amigo.foto || placeholderFoto}" />
           <p>${amigo.nome}</p>
+          <img src="${amigo.foto || placeholderFoto}" />
         `;
         card.onclick = () => abrirChat(amigo);
         friendsGrid.appendChild(card);
@@ -914,7 +1074,7 @@
     }
 
     window.proximaPagina = function () {
-      if ((paginaAtual + 1) * 12 < amigos.length) {
+      if ((paginaAtual + 1) * 9 < amigos.length) {
         paginaAtual++;
         renderizarAmigos();
       }
@@ -940,10 +1100,13 @@
         const user = docSnap.data();
         const jaSouEu = user.uid === usuarioAtual.uid;
         const jaEhAmigo = (dadosUsuario.amigos || []).includes(user.uid);
+        const jaEnviei = (dadosUsuario.solicitacoesEnviadas || []).includes(user.uid);
+        const bloqueei = (dadosUsuario.bloqueados || []).includes(user.uid);
+        const meBloqueou = (user.bloqueados || []).includes(usuarioAtual.uid);
         const bateNome = user.nome?.toLowerCase().includes(texto);
         const bateEmail = user.email?.toLowerCase().includes(texto);
 
-        if (!jaSouEu && !jaEhAmigo && (bateNome || bateEmail)) {
+        if (!jaSouEu && !jaEhAmigo && !jaEnviei && !bloqueei && !meBloqueou && (bateNome || bateEmail)) {
           const item = document.createElement("div");
           item.className = "result-item";
           item.innerHTML = `
@@ -952,27 +1115,82 @@
               <strong>${user.nome}</strong><br />
               <small>${user.email}</small>
             </div>
-            <button>Adicionar</button>
+            <button>Enviar convite</button>
           `;
-          item.querySelector("button").onclick = () => adicionarAmigo(user.uid);
+          item.querySelector("button").onclick = () => enviarSolicitacao(user.uid);
           searchResults.appendChild(item);
         }
       });
     };
 
-    async function adicionarAmigo(idAmigo) {
-      const meusAmigos = dadosUsuario.amigos || [];
+    async function enviarSolicitacao(idPessoa) {
+      if (!usuarioAtual || !idPessoa) return;
 
-      if (!meusAmigos.includes(idAmigo)) {
-        meusAmigos.push(idAmigo);
+      try {
         await updateDoc(doc(db, "users", usuarioAtual.uid), {
-          amigos: meusAmigos
+          solicitacoesEnviadas: arrayUnion(idPessoa)
         });
+
+        await updateDoc(doc(db, "users", idPessoa), {
+          solicitacoesRecebidas: arrayUnion(usuarioAtual.uid)
+        });
+
+        authStatus.textContent = "Solicitação de amizade enviada.";
+        await carregarUsuario();
+        await pesquisarUsuarios();
+      } catch (error) {
+        alert("Não foi possível enviar o convite: " + error.message);
       }
+    }
+
+    window.aceitarSolicitacao = async function (idPessoa) {
+      if (!usuarioAtual || !idPessoa) return;
+
+      await updateDoc(doc(db, "users", usuarioAtual.uid), {
+        amigos: arrayUnion(idPessoa),
+        solicitacoesRecebidas: arrayRemove(idPessoa)
+      });
+
+      await updateDoc(doc(db, "users", idPessoa), {
+        amigos: arrayUnion(usuarioAtual.uid),
+        solicitacoesEnviadas: arrayRemove(usuarioAtual.uid)
+      });
 
       await carregarUsuario();
-      await pesquisarUsuarios();
-    }
+    };
+
+    window.negarSolicitacao = async function (idPessoa) {
+      if (!usuarioAtual || !idPessoa) return;
+
+      await updateDoc(doc(db, "users", usuarioAtual.uid), {
+        solicitacoesRecebidas: arrayRemove(idPessoa)
+      });
+
+      await updateDoc(doc(db, "users", idPessoa), {
+        solicitacoesEnviadas: arrayRemove(usuarioAtual.uid)
+      });
+
+      await carregarUsuario();
+    };
+
+    window.bloquearPessoa = async function (idPessoa) {
+      if (!usuarioAtual || !idPessoa) return;
+
+      await updateDoc(doc(db, "users", usuarioAtual.uid), {
+        bloqueados: arrayUnion(idPessoa),
+        amigos: arrayRemove(idPessoa),
+        solicitacoesRecebidas: arrayRemove(idPessoa),
+        solicitacoesEnviadas: arrayRemove(idPessoa)
+      });
+
+      await updateDoc(doc(db, "users", idPessoa), {
+        amigos: arrayRemove(usuarioAtual.uid),
+        solicitacoesRecebidas: arrayRemove(usuarioAtual.uid),
+        solicitacoesEnviadas: arrayRemove(usuarioAtual.uid)
+      });
+
+      await carregarUsuario();
+    };
 
     function gerarChatId(id1, id2) {
       return [id1, id2].sort().join("_");
@@ -995,17 +1213,33 @@
       if (unsubscribeTyping) unsubscribeTyping();
 
       const mensagensRef = collection(db, "messages");
+
+      // Consulta simples para não depender de índice composto do Firestore.
+      // A organização por horário é feita aqui no navegador.
       const q = query(
         mensagensRef,
-        where("chatId", "==", chatIdAtual),
-        orderBy("createdAt", "asc")
+        where("chatId", "==", chatIdAtual)
       );
 
       unsubscribeMessages = onSnapshot(q, (snap) => {
         messages.innerHTML = "";
 
+        const listaMensagens = [];
+
         snap.forEach((docSnap) => {
-          const msg = docSnap.data();
+          listaMensagens.push({
+            id: docSnap.id,
+            ...docSnap.data()
+          });
+        });
+
+        listaMensagens.sort((a, b) => {
+          const tempoA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const tempoB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return tempoA - tempoB;
+        });
+
+        listaMensagens.forEach((msg) => {
           const div = document.createElement("div");
           const minha = msg.senderId === usuarioAtual.uid;
           div.className = "message " + (minha ? "mine" : "theirs");
@@ -1020,12 +1254,14 @@
           `;
 
           const botao = div.querySelector("button");
-          if (botao) botao.onclick = () => apagarMensagem(docSnap.id, tempo);
+          if (botao) botao.onclick = () => apagarMensagem(msg.id, tempo);
 
           messages.appendChild(div);
         });
 
         messages.scrollTop = messages.scrollHeight;
+      }, (error) => {
+        messages.innerHTML = `<p style="color:red; padding:10px;">Erro ao carregar mensagens: ${error.message}</p>`;
       });
 
       unsubscribeTyping = onSnapshot(doc(db, "chats", chatIdAtual), (snap) => {
@@ -1037,18 +1273,31 @@
 
     window.enviarMensagem = async function () {
       const texto = messageInput.value.trim();
-      if (!texto || !chatIdAtual) return;
 
-      await addDoc(collection(db, "messages"), {
-        chatId: chatIdAtual,
-        senderId: usuarioAtual.uid,
-        receiverId: amigoChat.uid,
-        texto,
-        createdAt: serverTimestamp()
-      });
+      if (!texto) return;
 
-      messageInput.value = "";
-      await pararDigitando();
+      if (!chatIdAtual || !amigoChat || !usuarioAtual) {
+        alert("Abra o chat de um amigo antes de enviar mensagem.");
+        return;
+      }
+
+      try {
+        const textoOriginal = texto;
+        messageInput.value = "";
+
+        await addDoc(collection(db, "messages"), {
+          chatId: chatIdAtual,
+          senderId: usuarioAtual.uid,
+          receiverId: amigoChat.uid,
+          texto: textoOriginal,
+          createdAt: serverTimestamp()
+        });
+
+        await pararDigitando();
+      } catch (error) {
+        messageInput.value = texto;
+        alert("Não foi possível enviar a mensagem: " + error.message);
+      }
     };
 
     async function apagarMensagem(messageId, tempo) {
